@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FMIC - Testimony & Prophecy Media Hub</title>
   
-  <!-- Mobile & PWA Configuration -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0d1117" />
   
-  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
@@ -44,32 +42,12 @@
     };
   </script>
 
-  <style>
-    /* Custom Scrollbar & Animations */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #090d16; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #059669; }
-
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.2; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.05); }
-    }
-    .animate-glow { animation: pulseGlow 4s infinite ease-in-out; }
-
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(1000%); }
-    }
-    .scanline-effect { animation: scanline 3s linear infinite; }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="bg-dark-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-  <!-- MAIN APP WRAPPER -->
   <div id="app" class="flex-1 flex flex-col h-screen overflow-hidden">
     
-    <!-- TOP HEADER BAR -->
     <header class="bg-dark-800/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between z-20">
       <div class="flex items-center space-x-3">
         <div class="bg-gradient-to-tr from-brand-600 to-gold-500 p-2 rounded-xl shadow-lg shadow-brand-500/10">
@@ -83,7 +61,6 @@
         </div>
       </div>
 
-      <!-- User Greeting & Profile Switcher -->
       <div class="flex items-center space-x-4">
         <div class="hidden sm:flex items-center space-x-2 bg-dark-700/60 px-3 py-1.5 rounded-lg border border-slate-700">
           <i data-lucide="user-check" class="w-4 h-4 text-brand-500"></i>
@@ -93,18 +70,11 @@
             <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
           </button>
         </div>
-
-        <button onclick="openTab('deployment')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 flex items-center space-x-1.5 transition">
-          <i data-lucide="github" class="w-4 h-4 text-white"></i>
-          <span class="hidden md:inline">Deploy Guide</span>
-        </button>
       </div>
     </header>
 
-    <!-- DASHBOARD CONTAINER -->
     <div class="flex-1 flex overflow-hidden">
       
-      <!-- SIDEBAR NAVIGATION -->
       <aside class="w-16 md:w-60 bg-dark-800 border-r border-slate-800 flex flex-col justify-between p-2 md:p-4 z-10">
         <nav class="space-y-1">
           <button onclick="openTab('workspace')" id="nav-workspace" class="nav-btn active w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-sm font-medium bg-brand-600 text-white shadow-lg shadow-brand-600/20">
@@ -117,80 +87,42 @@
             <span class="hidden md:inline">Found Clips Queue</span>
             <span id="queueBadge" class="hidden md:inline-block ml-auto text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">0</span>
           </button>
-
-          <button onclick="openTab('rules')" id="nav-rules" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-sm font-medium text-slate-400 hover:bg-dark-700 hover:text-slate-200">
-            <i data-lucide="shield-alert" class="w-5 h-5 shrink-0"></i>
-            <span class="hidden md:inline">Ministry Rules</span>
-          </button>
-
-          <button onclick="openTab('deployment')" id="nav-deployment" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-sm font-medium text-slate-400 hover:bg-dark-700 hover:text-slate-200">
-            <i data-lucide="cloud-upload" class="w-5 h-5 shrink-0"></i>
-            <span class="hidden md:inline">Vercel & GitHub</span>
-          </button>
         </nav>
-
-        <!-- System Background Monitor -->
-        <div class="hidden md:block bg-dark-900/80 border border-slate-800 p-3 rounded-xl">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Engine Status</span>
-            <span class="flex h-2 w-2 relative">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
-            </span>
-          </div>
-          <p class="text-[11px] text-slate-400">Background AI Matcher Active</p>
-          <div id="activeTaskIndicator" class="mt-2 text-[10px] text-brand-500 font-mono hidden">
-            Running scan in background...
-          </div>
-        </div>
       </aside>
 
-      <!-- MAIN CONTENT WORKSPACE -->
       <main class="flex-1 overflow-y-auto bg-gradient-to-b from-dark-900 to-black p-4 md:p-6">
         
-        <!-- WELCOME BANNER WITH USER GREETING -->
         <div class="mb-6 bg-gradient-to-r from-dark-800 via-dark-800/90 to-brand-900/30 border border-slate-800/80 p-5 rounded-2xl relative overflow-hidden shadow-xl">
           <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 id="welcomeGreeting" class="text-2xl font-bold text-white tracking-tight">
-                Hello, Editor!
-              </h2>
-              <p class="text-sm text-slate-400 mt-1">
-                FMIC Testimony Location & AI Service Editing Engine
-              </p>
+              <h2 id="welcomeGreeting" class="text-2xl font-bold text-white tracking-tight">Hello, Editor!</h2>
+              <p class="text-sm text-slate-400 mt-1">FMIC Testimony Location & AI Service Editing Engine</p>
             </div>
-            
             <div class="flex items-center space-x-2 bg-dark-900/80 p-2 rounded-xl border border-slate-700/60">
               <i data-lucide="youtube" class="w-5 h-5 text-red-500"></i>
-              <span class="text-xs font-mono text-slate-300">YouTube Target Channel:</span>
+              <span class="text-xs font-mono text-slate-300">Channel Archive:</span>
               <span class="text-xs font-bold text-gold-400">@GFDAVIDMINISTRIES</span>
             </div>
           </div>
         </div>
 
-        <!-- TAB 1: WORKSPACE / SCANNER PAGE -->
         <section id="tab-workspace" class="tab-content space-y-6">
-          
-          <!-- SOURCE SELECTION & CASE METADATA FORM -->
           <div class="bg-dark-800/70 border border-slate-800 p-5 rounded-2xl space-y-5">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div class="flex items-center space-x-2">
                 <span class="bg-brand-500/20 text-brand-500 text-xs font-bold px-2.5 py-1 rounded-md border border-brand-500/30">STEP 1</span>
                 <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider">Configure Extraction Target</h3>
               </div>
-              <span class="text-xs text-slate-400">Fill details & pick media source</span>
+              <span class="text-xs text-slate-400">Select source and service date</span>
             </div>
 
-            <!-- SOURCE TOGGLE (YouTube vs Local Files) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label id="btnSourceYouTube" onclick="setSource('youtube')" class="source-card cursor-pointer border-2 border-brand-500 bg-brand-500/10 p-4 rounded-xl flex items-center justify-between transition">
                 <div class="flex items-center space-x-3">
-                  <div class="p-2.5 bg-red-600/20 rounded-lg text-red-500">
-                    <i data-lucide="youtube" class="w-6 h-6"></i>
-                  </div>
+                  <div class="p-2.5 bg-red-600/20 rounded-lg text-red-500"><i data-lucide="youtube" class="w-6 h-6"></i></div>
                   <div>
-                    <h4 class="font-semibold text-sm text-white">YouTube Stream / Video</h4>
-                    <p class="text-xs text-slate-400">Search GFDAVIDMINISTRIES YouTube service archives</p>
+                    <h4 class="font-semibold text-sm text-white">YouTube Stream Date</h4>
+                    <p class="text-xs text-slate-400">Search GFDAVIDMINISTRIES archive by service date</p>
                   </div>
                 </div>
                 <input type="radio" name="sourceType" value="youtube" checked class="hidden" />
@@ -199,9 +131,7 @@
 
               <label id="btnSourceLocal" onclick="setSource('local')" class="source-card cursor-pointer border-2 border-slate-800 bg-dark-900/50 p-4 rounded-xl flex items-center justify-between transition">
                 <div class="flex items-center space-x-3">
-                  <div class="p-2.5 bg-blue-600/20 rounded-lg text-blue-400">
-                    <i data-lucide="hard-drive" class="w-6 h-6"></i>
-                  </div>
+                  <div class="p-2.5 bg-blue-600/20 rounded-lg text-blue-400"><i data-lucide="hard-drive" class="w-6 h-6"></i></div>
                   <div>
                     <h4 class="font-semibold text-sm text-white">Local Video Files</h4>
                     <p class="text-xs text-slate-400">Scan raw recorded service files on your laptop</p>
@@ -212,20 +142,16 @@
               </label>
             </div>
 
-            <!-- FORM INPUTS -->
             <form id="extractionForm" onsubmit="handleStartScan(event)" class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
-                <!-- Member Name -->
                 <div>
                   <label class="block text-xs font-medium text-slate-300 mb-1">Member Name <span class="text-brand-500">*</span></label>
                   <div class="relative">
                     <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
-                    <input type="text" id="memberName" required placeholder="e.g. Sister Sister Blessed" class="w-full bg-dark-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition" />
+                    <input type="text" id="memberName" required placeholder="e.g. Sister Grace" class="w-full bg-dark-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition" />
                   </div>
                 </div>
 
-                <!-- Case Category -->
                 <div>
                   <label class="block text-xs font-medium text-slate-300 mb-1">Ministry Category <span class="text-brand-500">*</span></label>
                   <select id="caseCategory" onchange="handleCategoryChange()" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition">
@@ -236,7 +162,6 @@
                   </select>
                 </div>
 
-                <!-- Custom Service Duration -->
                 <div>
                   <label class="block text-xs font-medium text-slate-300 mb-1">Approx. Service Length</label>
                   <select id="serviceDuration" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition">
@@ -244,70 +169,58 @@
                     <option value="3">3 Hours Service</option>
                     <option value="6">6 Hours Service</option>
                     <option value="10" selected>10 Hours Service Stream</option>
-                    <option value="12">12+ Hours Overnight</option>
                   </select>
                 </div>
               </div>
 
-              <!-- Case Description & Details -->
               <div>
                 <label class="block text-xs font-medium text-slate-300 mb-1">Case / Prophecy Description <span class="text-brand-500">*</span></label>
-                <textarea id="caseDescription" required rows="2" placeholder="Describe what she was prophesied to about or her specific case on the prayer line (e.g., 'Prophesied about family deliverance and healing from knee pain')..." class="w-full bg-dark-900 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-brand-500 transition"></textarea>
+                <textarea id="caseDescription" required rows="2" placeholder="Describe what she was prophesied to or her prayer line case..." class="w-full bg-dark-900 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-brand-500 transition"></textarea>
               </div>
 
-              <!-- Media Links or Local Uploads -->
               <div id="sourceInputContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                
-                <!-- YouTube URL Input -->
-                <div id="youtubeInputGroup">
-                  <label class="block text-xs font-medium text-slate-300 mb-1">GFDAVIDMINISTRIES YouTube Service URL</label>
+                <!-- REPLACED LINK INPUT WITH SERVICE DATE INPUT -->
+                <div id="youtubeDateInputGroup">
+                  <label class="block text-xs font-medium text-slate-300 mb-1">GFDAVIDMINISTRIES Service Date <span class="text-brand-500">*</span></label>
                   <div class="relative">
-                    <i data-lucide="link" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
-                    <input type="url" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-dark-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition" />
+                    <i data-lucide="calendar" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
+                    <input type="date" id="serviceDate" class="w-full bg-dark-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500 transition" />
                   </div>
                 </div>
 
-                <!-- Local Laptop File Selector -->
                 <div id="localInputGroup" class="hidden">
                   <label class="block text-xs font-medium text-slate-300 mb-1">Select Service Video File from Laptop</label>
                   <input type="file" id="localVideoFile" accept="video/*" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:bg-brand-600 file:text-white hover:file:bg-brand-500 transition" />
                 </div>
 
-                <!-- Member Face Photo -->
                 <div>
-                  <label class="block text-xs font-medium text-slate-300 mb-1">
-                    Member Photo for AI Face Matching <span class="text-slate-500">(Optional)</span>
-                  </label>
+                  <label class="block text-xs font-medium text-slate-300 mb-1">Member Photo for AI Face Matching (Optional)</label>
                   <input type="file" id="memberPhoto" accept="image/*" onchange="handlePhotoPreview(event)" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:bg-dark-700 file:text-slate-200 hover:file:bg-dark-600 transition" />
                 </div>
               </div>
 
-              <!-- Image Preview Box -->
               <div id="photoPreviewContainer" class="hidden flex items-center space-x-3 p-3 bg-dark-900/80 rounded-xl border border-slate-800">
                 <img id="photoPreview" src="" alt="Member Preview" class="w-12 h-12 object-cover rounded-lg border border-brand-500" />
                 <div>
                   <p class="text-xs font-semibold text-slate-200">Face Recognition Profile Attached</p>
-                  <p class="text-[11px] text-slate-400">AI face signature will be matched against service video timeline</p>
+                  <p class="text-[11px] text-slate-400">AI face signature matched against date archive</p>
                 </div>
               </div>
 
-              <!-- Rule Enforcement Warning -->
               <div id="prayerLineRuleNotice" class="hidden p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400 text-xs flex items-center space-x-2">
                 <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
                 <span><strong>Ministry Security Rule:</strong> Prayer Line cases cannot be searched on YouTube. Source locked to Local Laptop Files.</span>
               </div>
 
-              <!-- START SCAN BUTTON -->
               <div class="pt-3">
                 <button type="submit" id="btnStartScan" class="w-full bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-brand-500/25 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]">
                   <i data-lucide="zap" class="w-5 h-5"></i>
-                  <span>Start Fast AI Scan & Video Extraction</span>
+                  <span>Check Service Date Archive & Extract Testimony</span>
                 </button>
               </div>
             </form>
           </div>
 
-          <!-- FAST AI SCANNER PROGRESS MONITOR -->
           <div id="scanProgressCard" class="hidden bg-dark-800 border border-brand-500/30 p-6 rounded-2xl relative overflow-hidden shadow-2xl">
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center space-x-3">
@@ -315,26 +228,25 @@
                   <i data-lucide="cpu" class="w-6 h-6"></i>
                 </div>
                 <div>
-                  <h3 id="scanProgressTitle" class="text-base font-bold text-white">Scanning Service Stream...</h3>
-                  <p id="scanProgressSubtitle" class="text-xs text-slate-400">Accelerated audio-transcript & face identification active</p>
+                  <h3 id="scanProgressTitle" class="text-base font-bold text-white">Checking GFDAVIDMINISTRIES Archive...</h3>
+                  <p id="scanProgressSubtitle" class="text-xs text-slate-400">Scanning service stream for specified date</p>
                 </div>
               </div>
               <span id="scanPercent" class="text-2xl font-mono font-extrabold text-brand-500">0%</span>
             </div>
 
-            <!-- Progress Bar -->
             <div class="w-full bg-dark-900 rounded-full h-3 overflow-hidden border border-slate-700/50 mb-4">
               <div id="scanProgressBar" class="bg-gradient-to-r from-brand-600 via-emerald-400 to-gold-400 h-full w-0 transition-all duration-300"></div>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
               <div class="bg-dark-900/60 p-2.5 rounded-lg border border-slate-800">
-                <span class="text-slate-500 block">Service Time Processed</span>
-                <span id="statTimeProcessed" class="font-mono font-bold text-slate-200">00:00:00 / 10:00:00</span>
+                <span class="text-slate-500 block">Service Date Target</span>
+                <span id="statDateTarget" class="font-mono font-bold text-gold-400">Today</span>
               </div>
               <div class="bg-dark-900/60 p-2.5 rounded-lg border border-slate-800">
                 <span class="text-slate-500 block">Scan Speed</span>
-                <span id="statSpeed" class="font-mono font-bold text-brand-500">600x Real-time</span>
+                <span class="font-mono font-bold text-brand-500">600x Real-time</span>
               </div>
               <div class="bg-dark-900/60 p-2.5 rounded-lg border border-slate-800">
                 <span class="text-slate-500 block">Pre-roll Buffer</span>
@@ -348,6 +260,12 @@
           </div>
         </section>
 
-        <!-- TAB 2: FOUND CLIPS QUEUE -->
-        <section id="tab-archive" class="tab-content hidden space-y-6">
-          <div class="flex items-center justify-between
+        <div id="part2-container"></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="index_part2.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
