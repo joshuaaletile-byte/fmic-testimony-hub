@@ -1,41 +1,36 @@
-// APP STATE
 let currentUser = localStorage.getItem('fmic_user_name') || '';
-let currentSource = 'youtube'; // 'youtube' or 'local'
+let currentSource = 'youtube';
 let extractedClips = [];
 let currentScanInterval = null;
 let pendingMatches = [];
 
-// INITIALIZATION
 window.addEventListener('DOMContentLoaded', () => {
-  if (window.lucide) {
-    lucide.createIcons();
-  }
+  if (window.lucide) lucide.createIcons();
   checkUserSession();
   loadSavedClips();
+  
+  // Set default date to today
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = document.getElementById('serviceDate');
+  if (dateInput) dateInput.value = today;
 });
 
-// USER SESSION MANAGEMENT
 function checkUserSession() {
   if (!currentUser) {
-    document.getElementById('userModal').classList.remove('hidden');
-  } else {
-    updateUserUI();
-  }
-}
-
-function saveUserSession() {
-  const input = document.getElementById('inputUserName').value.trim();
-  if (input) {
-    currentUser = input;
+    const nameInput = prompt("Welcome to FMIC Media Hub! Please enter your editor name:") || "Editor";
+    currentUser = nameInput.trim();
     localStorage.setItem('fmic_user_name', currentUser);
-    document.getElementById('userModal').classList.add('hidden');
-    updateUserUI();
   }
+  updateUserUI();
 }
 
 function promptUserChange() {
-  document.getElementById('inputUserName').value = currentUser;
-  document.getElementById('userModal').classList.remove('hidden');
+  const nameInput = prompt("Enter new editor name:", currentUser);
+  if (nameInput) {
+    currentUser = nameInput.trim();
+    localStorage.setItem('fmic_user_name', currentUser);
+    updateUserUI();
+  }
 }
 
 function updateUserUI() {
@@ -43,7 +38,6 @@ function updateUserUI() {
   document.getElementById('welcomeGreeting').textContent = `Hello, ${currentUser}!`;
 }
 
-// TAB SWITCHING
 function openTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -59,12 +53,11 @@ function openTab(tabId) {
   }
 }
 
-// SOURCE SELECTION LOGIC
 function setSource(source) {
   currentSource = source;
   const ytCard = document.getElementById('btnSourceYouTube');
   const localCard = document.getElementById('btnSourceLocal');
-  const ytGroup = document.getElementById('youtubeInputGroup');
+  const ytGroup = document.getElementById('youtubeDateInputGroup');
   const localGroup = document.getElementById('localInputGroup');
 
   if (source === 'youtube') {
@@ -80,7 +73,6 @@ function setSource(source) {
   }
 }
 
-// MINISTRY RULE ENFORCEMENT
 function handleCategoryChange() {
   const cat = document.getElementById('caseCategory').value;
   const notice = document.getElementById('prayerLineRuleNotice');
@@ -95,7 +87,6 @@ function handleCategoryChange() {
   }
 }
 
-// PHOTO PREVIEW
 function handlePhotoPreview(e) {
   const file = e.target.files[0];
   if (file) {
@@ -108,35 +99,28 @@ function handlePhotoPreview(e) {
   }
 }
 
-// FAST SCAN ENGINE SIMULATION
 function handleStartScan(e) {
   e.preventDefault();
   
   const memberName = document.getElementById('memberName').value.trim();
   const caseDesc = document.getElementById('caseDescription').value.trim();
   const category = document.getElementById('caseCategory').value;
-  const hours = parseInt(document.getElementById('serviceDuration').value);
+  const serviceDate = document.getElementById('serviceDate')?.value || 'Recent';
 
   if (!memberName || !caseDesc) return;
 
   const scanCard = document.getElementById('scanProgressCard');
   scanCard.classList.remove('hidden');
-  document.getElementById('activeTaskIndicator').classList.remove('hidden');
+  document.getElementById('statDateTarget').textContent = serviceDate;
 
   let progress = 0;
   let matchedCount = 0;
   clearInterval(currentScanInterval);
 
   currentScanInterval = setInterval(() => {
-    progress += 5;
+    progress += 10;
     document.getElementById('scanPercent').textContent = `${progress}%`;
     document.getElementById('scanProgressBar').style.width = `${progress}%`;
-
-    const currentTotalSecs = (hours * 3600) * (progress / 100);
-    const hrs = Math.floor(currentTotalSecs / 3600).toString().padStart(2, '0');
-    const mins = Math.floor((currentTotalSecs % 3600) / 60).toString().padStart(2, '0');
-    const secs = Math.floor(currentTotalSecs % 60).toString().padStart(2, '0');
-    document.getElementById('statTimeProcessed').textContent = `${hrs}:${mins}:${secs} / ${hours.toString().padStart(2, '0')}:00:00`;
 
     if (progress === 40 || progress === 80) {
       matchedCount++;
@@ -145,7 +129,6 @@ function handleStartScan(e) {
 
     if (progress >= 100) {
       clearInterval(currentScanInterval);
-      document.getElementById('activeTaskIndicator').classList.add('hidden');
       
       pendingMatches = [
         {
@@ -153,16 +136,17 @@ function handleStartScan(e) {
           memberName: memberName,
           caseDesc: caseDesc,
           category: category,
-          timestamp: "03:14:20",
-          preRollTimestamp: "03:14:05",
-          formattedFileName: `${cleanString(memberName)}_${cleanString(caseDesc)}_03h14m05s.mp4`,
+          serviceDate: serviceDate,
+          timestamp: "02:15:40",
+          preRollTimestamp: "02:15:25",
+          formattedFileName: `${cleanString(memberName)}_${serviceDate}_02h15m25s.mp4`,
           source: currentSource
         }
       ];
 
       openVerificationModal(pendingMatches[0]);
     }
-  }, 300);
+  }, 250);
 }
 
 function cleanString(str) {
@@ -170,8 +154,8 @@ function cleanString(str) {
 }
 
 function openVerificationModal(match) {
-  document.getElementById('modalCandidateTitle').textContent = `${match.memberName} - Ministration Candidate`;
-  document.getElementById('modalCandidateDetails').textContent = `Raw Timestamp: ${match.timestamp} | Clipping Start: ${match.preRollTimestamp} (-15s pre-roll buffer applied)`;
+  document.getElementById('modalCandidateTitle').textContent = `${match.memberName} - Archive Match (${match.serviceDate})`;
+  document.getElementById('modalCandidateDetails').textContent = `Service Date Archive: GFDAVIDMINISTRIES | -15s pre-roll buffer applied`;
   document.getElementById('modalMemberName').textContent = match.memberName;
   document.getElementById('modalCaseDesc').textContent = match.caseDesc;
   document.getElementById('clipVerificationModal').classList.remove('hidden');
@@ -202,22 +186,23 @@ function renderClipsGrid() {
   const emptyState = document.getElementById('emptyQueueState');
   const badge = document.getElementById('queueBadge');
 
-  badge.textContent = extractedClips.length;
+  if (badge) badge.textContent = extractedClips.length;
+  if (!container) return;
 
   if (extractedClips.length === 0) {
-    emptyState.classList.remove('hidden');
+    if (emptyState) emptyState.classList.remove('hidden');
     container.innerHTML = '';
     return;
   }
 
-  emptyState.classList.add('hidden');
+  if (emptyState) emptyState.classList.add('hidden');
   container.innerHTML = extractedClips.map(clip => `
     <div class="bg-dark-800 border border-slate-800 rounded-xl p-4 space-y-3 shadow-lg hover:border-brand-500/40 transition">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-500/20 text-brand-500 border border-brand-500/30">
           ${clip.category}
         </span>
-        <span class="text-xs text-slate-400 font-mono">${clip.preRollTimestamp}</span>
+        <span class="text-xs text-slate-400 font-mono">${clip.serviceDate}</span>
       </div>
 
       <div>
@@ -230,7 +215,7 @@ function renderClipsGrid() {
       </div>
 
       <div class="flex items-center justify-between pt-2">
-        <span class="text-[10px] text-slate-500">Source: ${clip.source.toUpperCase()}</span>
+        <span class="text-[10px] text-slate-500">Date: ${clip.serviceDate}</span>
         <button onclick="downloadClip('${clip.formattedFileName}')" class="bg-brand-600 hover:bg-brand-500 text-white text-xs px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span>Export Clip</span>
@@ -239,9 +224,7 @@ function renderClipsGrid() {
     </div>
   `).join('');
 
-  if (window.lucide) {
-    lucide.createIcons();
-  }
+  if (window.lucide) lucide.createIcons();
 }
 
 function saveClipsToStorage() {
