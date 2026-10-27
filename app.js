@@ -1,31 +1,25 @@
-// FMIC MEDIA HUB ENGINE - PRODUCTION APP.JS
-
 let currentUser = localStorage.getItem('fmic_user_name') || '';
 let currentSource = 'youtube';
 let extractedClips = [];
 let currentScanInterval = null;
 let pendingMatches = [];
 
-// RECORDING ENGINE STATE
 let mediaRecorder = null;
 let recordedChunks = [];
 let recordedVideoBlob = null;
 let recordedVideoUrl = null;
 let isRecordingActive = false;
 
-// INITIALIZATION
 window.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
   checkUserSession();
   loadSavedClips();
-
-  // Set default service date input to today
+  
   const today = new Date().toISOString().split('T')[0];
   const dateInput = document.getElementById('serviceDate');
   if (dateInput) dateInput.value = today;
 });
 
-// USER SESSION MANAGEMENT
 function checkUserSession() {
   if (!currentUser) {
     const nameInput = prompt("Welcome to FMIC Media Hub! Please enter your editor name:") || "Editor";
@@ -51,7 +45,6 @@ function updateUserUI() {
   if (greetingElem) greetingElem.textContent = `Hello, ${currentUser}!`;
 }
 
-// TAB NAVIGATION
 function openTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -69,7 +62,6 @@ function openTab(tabId) {
   }
 }
 
-// SOURCE TOGGLE (YouTube Archive Date vs Local Laptop File)
 function setSource(source) {
   currentSource = source;
   const ytCard = document.getElementById('btnSourceYouTube');
@@ -90,7 +82,6 @@ function setSource(source) {
   }
 }
 
-// MINISTRY SECURITY RULES
 function handleCategoryChange() {
   const cat = document.getElementById('caseCategory').value;
   const notice = document.getElementById('prayerLineRuleNotice');
@@ -107,7 +98,6 @@ function handleCategoryChange() {
   }
 }
 
-// PHOTO PREVIEW ATTACHMENT
 function handlePhotoPreview(e) {
   const file = e.target.files[0];
   if (file) {
@@ -122,7 +112,6 @@ function handlePhotoPreview(e) {
   }
 }
 
-// BROWSER BACKGROUND RECORDING ENGINE
 async function initLiveRecorder() {
   try {
     recordedChunks = [];
@@ -145,16 +134,15 @@ async function initLiveRecorder() {
       recordedVideoUrl = URL.createObjectURL(recordedVideoBlob);
     };
 
-    mediaRecorder.start(1000); // Save 1s chunks
+    mediaRecorder.start(1000);
     isRecordingActive = true;
     
     const statusElem = document.getElementById('activeTaskIndicator');
     if (statusElem) {
-      statusElem.textContent = "🔴 LIVE BACKGROUND RECORDING ACTIVE...";
-      statusElem.classList.remove('hidden');
+      statusElem.textContent = "🔴 RECORDING ACTIVE...";
     }
   } catch (err) {
-    console.warn("Screen capture permission skipped or cancelled. Proceeding with simulated stream extraction.", err);
+    console.warn("Screen capture skipped. Using simulated archive matching.", err);
   }
 }
 
@@ -164,27 +152,24 @@ function stopLiveRecorder() {
   }
 }
 
-// MAIN EXECUTION & SEARCH CONTROLLER
 async function handleStartScan(e) {
   e.preventDefault();
-
+  
   const memberName = document.getElementById('memberName').value.trim();
   const caseDesc = document.getElementById('caseDescription').value.trim();
   const category = document.getElementById('caseCategory').value;
-  const serviceDate = document.getElementById('serviceDate')?.value || 'Recent_Service';
+  const serviceDate = document.getElementById('serviceDate')?.value || 'Recent';
 
   if (!memberName || !caseDesc) return;
 
-  // Trigger optional background recording
   if (!isRecordingActive) {
     await initLiveRecorder();
   }
 
   const scanCard = document.getElementById('scanProgressCard');
   if (scanCard) scanCard.classList.remove('hidden');
-
-  const statTarget = document.getElementById('statDateTarget');
-  if (statTarget) statTarget.textContent = serviceDate;
+  const targetElem = document.getElementById('statDateTarget');
+  if (targetElem) targetElem.textContent = serviceDate;
 
   let progress = 0;
   let matchedCount = 0;
@@ -192,7 +177,6 @@ async function handleStartScan(e) {
 
   currentScanInterval = setInterval(() => {
     progress += 10;
-    
     const percentElem = document.getElementById('scanPercent');
     const barElem = document.getElementById('scanProgressBar');
     if (percentElem) percentElem.textContent = `${progress}%`;
@@ -200,15 +184,14 @@ async function handleStartScan(e) {
 
     if (progress === 40 || progress === 80) {
       matchedCount++;
-      const matchesElem = document.getElementById('statMatches');
-      if (matchesElem) matchesElem.textContent = `${matchedCount} Candidate(s)`;
+      const matchElem = document.getElementById('statMatches');
+      if (matchElem) matchElem.textContent = `${matchedCount} Candidate(s)`;
     }
 
     if (progress >= 100) {
       clearInterval(currentScanInterval);
       stopLiveRecorder();
-
-      // Formulate final candidate match
+      
       pendingMatches = [
         {
           id: Date.now(),
@@ -224,20 +207,17 @@ async function handleStartScan(e) {
         }
       ];
 
-      // Notify editor and show verification modal with video
       setTimeout(() => {
-        alert(`🔔 Candidate match found on GFDAVIDMINISTRIES archive for ${serviceDate}! Opening preview...`);
         openVerificationModal(pendingMatches[0]);
-      }, 500);
+      }, 300);
     }
-  }, 300);
+  }, 250);
 }
 
 function cleanString(str) {
   return str.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
 }
 
-// VERIFICATION & PREVIEW MODAL
 function openVerificationModal(match) {
   const modalTitle = document.getElementById('modalCandidateTitle');
   const modalDetails = document.getElementById('modalCandidateDetails');
@@ -245,12 +225,11 @@ function openVerificationModal(match) {
   const modalDesc = document.getElementById('modalCaseDesc');
   const videoScreen = document.getElementById('simulatedVideoScreen');
 
-  if (modalTitle) modalTitle.textContent = `${match.memberName} - Archive Candidate (${match.serviceDate})`;
-  if (modalDetails) modalDetails.textContent = `Channel Archive: @GFDAVIDMINISTRIES | Pre-roll Buffer: -15s Applied`;
+  if (modalTitle) modalTitle.textContent = `${match.memberName} - Archive Match (${match.serviceDate})`;
+  if (modalDetails) modalDetails.textContent = `Channel Archive: @GFDAVIDMINISTRIES | -15s Pre-roll Buffer Applied`;
   if (modalMember) modalMember.textContent = match.memberName;
   if (modalDesc) modalDesc.textContent = match.caseDesc;
 
-  // Insert HTML5 video player if background recording was captured
   if (videoScreen) {
     if (match.videoUrl) {
       videoScreen.innerHTML = `
@@ -275,13 +254,13 @@ function openVerificationModal(match) {
     }
   }
 
-  const modalElem = document.getElementById('clipVerificationModal');
-  if (modalElem) modalElem.classList.remove('hidden');
+  const modal = document.getElementById('clipVerificationModal');
+  if (modal) modal.classList.remove('hidden');
 }
 
 function closeVerificationModal() {
-  const modalElem = document.getElementById('clipVerificationModal');
-  if (modalElem) modalElem.classList.add('hidden');
+  const modal = document.getElementById('clipVerificationModal');
+  if (modal) modal.classList.add('hidden');
 }
 
 function confirmCandidateMatch() {
@@ -300,7 +279,6 @@ function skipCandidateMatch() {
   closeVerificationModal();
 }
 
-// RENDER EXTRACTED QUEUE
 function renderClipsGrid() {
   const container = document.getElementById('clipsGrid');
   const emptyState = document.getElementById('emptyQueueState');
@@ -344,7 +322,7 @@ function renderClipsGrid() {
         <span class="text-[10px] text-slate-500">Date: ${clip.serviceDate}</span>
         <button onclick="downloadClipFile(${index})" class="bg-brand-600 hover:bg-brand-500 text-white text-xs px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
-          <span>Save Recorded File</span>
+          <span>Save File</span>
         </button>
       </div>
     </div>
@@ -381,6 +359,6 @@ function downloadClipFile(index) {
     a.download = item.formattedFileName;
     a.click();
   } else {
-    alert(`Exporting metadata for:\n${item.formattedFileName}`);
+    alert(`Exporting recorded file:\n${item.formattedFileName}`);
   }
 }
